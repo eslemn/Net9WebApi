@@ -1,7 +1,7 @@
 ﻿using Microsoft.AspNetCore.Mvc;
-using Microsoft.EntityFrameworkCore;
-using Net9WebApi.Data;
-using Net9WebApi.Entities;
+using Net9WebApi.DTOs.Category;
+using Net9WebApi.Services.Interfaces;
+using Net9WebApi.Wrappers;
 
 namespace Net9WebApi.Controllers
 {
@@ -9,32 +9,34 @@ namespace Net9WebApi.Controllers
     [Route("api/[controller]")]
     public class CategoryController : ControllerBase
     {
-        private readonly AppDbContext _context;
+        private readonly ICategoryService _categoryService;
 
-        public CategoryController(AppDbContext context)
+        public CategoryController(ICategoryService categoryService)
         {
-            _context = context;
+            _categoryService = categoryService;
         }
 
-        // GET: api/category
         [HttpGet]
         public async Task<IActionResult> GetAll()
         {
-            var categories = await _context.Categories.ToListAsync();
-            return Ok(categories);
+            var categories = await _categoryService.GetAllAsync();
+
+            return Ok(ApiResponse<List<CategoryResponseDto>>.SuccessResponse(
+                categories,
+                "Categories listed successfully"
+            ));
         }
 
-        // POST: api/category
         [HttpPost]
-        public async Task<IActionResult> Create(Category category)
+        public async Task<IActionResult> Create([FromBody] CategoryCreateDto dto)
         {
-            category.CreatedAt = DateTime.UtcNow;
-            category.UpdatedAt = DateTime.UtcNow;
+            var result = await _categoryService.CreateAsync(dto);
 
-            _context.Categories.Add(category);
-            await _context.SaveChangesAsync();
-
-            return Ok(category);
+            return CreatedAtAction(nameof(GetAll),
+                ApiResponse<CategoryResponseDto>.SuccessResponse(
+                    result,
+                    "Category created successfully"
+                ));
         }
     }
 }

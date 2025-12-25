@@ -1,19 +1,38 @@
-using Microsoft.EntityFrameworkCore;
+﻿using Microsoft.EntityFrameworkCore;
 using Net9WebApi.Data;
+using Net9WebApi.Services.Interfaces;
+using Net9WebApi.Services.Implementations;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Swagger services
+//
+// 🔹 SERVICES
+//
+
+// Controller support
+builder.Services.AddControllers();
+
+// Swagger / OpenAPI
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen();
 
-// PostgreSQL + DbContext
+// DbContext (örnek: SQL Server)
+// Eğer SQLite / PostgreSQL kullanıyorsan burayı sonra değiştiririz
 builder.Services.AddDbContext<AppDbContext>(options =>
-    options.UseNpgsql(builder.Configuration.GetConnectionString("PostgreSql")));
+    options.UseNpgsql(
+    builder.Configuration.GetConnectionString("DefaultConnection")
+)
+);
+
+// Service Layer (DI)
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 var app = builder.Build();
 
-// Swagger middleware
+//
+// 🔹 MIDDLEWARE PIPELINE
+//
+
 if (app.Environment.IsDevelopment())
 {
     app.UseSwagger();
@@ -22,7 +41,12 @@ if (app.Environment.IsDevelopment())
 
 app.UseHttpsRedirection();
 
-// Test endpoint
-app.MapGet("/", () => "API is running");
+// (JWT eklenince buraya Authentication gelecek)
+// app.UseAuthentication();
+
+app.UseAuthorization();
+
+// Controller endpoint’leri
+app.MapControllers();
 
 app.Run();
