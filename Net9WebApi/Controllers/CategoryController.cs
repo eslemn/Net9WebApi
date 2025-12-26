@@ -1,42 +1,72 @@
-﻿using Microsoft.AspNetCore.Mvc;
-using Net9WebApi.DTOs.Category;
+﻿using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
+using Net9WebApi.DTOs;
 using Net9WebApi.Services.Interfaces;
 using Net9WebApi.Wrappers;
 
 namespace Net9WebApi.Controllers
 {
-    [ApiController]
     [Route("api/[controller]")]
+    [ApiController]
     public class CategoryController : ControllerBase
     {
-        private readonly ICategoryService _categoryService;
+        private readonly ICategoryService _service;
 
-        public CategoryController(ICategoryService categoryService)
+        public CategoryController(ICategoryService service)
         {
-            _categoryService = categoryService;
+            _service = service;
         }
 
         [HttpGet]
+        [ProducesResponseType(typeof(ApiResponse<List<CategoryDto>>), StatusCodes.Status200OK)]
         public async Task<IActionResult> GetAll()
         {
-            var categories = await _categoryService.GetAllAsync();
+            var data = await _service.GetAllAsync();
+            return Ok(ApiResponse<List<CategoryDto>>.SuccessResponse(data));
+        }
 
-            return Ok(ApiResponse<List<CategoryResponseDto>>.SuccessResponse(
-                categories,
-                "Categories listed successfully"
-            ));
+        [HttpGet("{id}")]
+        [ProducesResponseType(typeof(ApiResponse<CategoryDto>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<CategoryDto>), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> GetById(int id)
+        {
+            var data = await _service.GetByIdAsync(id);
+            if (data == null)
+                return NotFound(ApiResponse<CategoryDto>.FailResponse("Category not found"));
+
+            return Ok(ApiResponse<CategoryDto>.SuccessResponse(data));
         }
 
         [HttpPost]
-        public async Task<IActionResult> Create([FromBody] CategoryCreateDto dto)
+        [ProducesResponseType(typeof(ApiResponse<CategoryDto>), StatusCodes.Status201Created)]
+        public async Task<IActionResult> Create([FromBody] CreateCategoryDto dto)
         {
-            var result = await _categoryService.CreateAsync(dto);
+            var data = await _service.CreateAsync(dto);
+            return CreatedAtAction(nameof(GetById), new { id = data.Id }, ApiResponse<CategoryDto>.SuccessResponse(data, "Category created successfully"));
+        }
 
-            return CreatedAtAction(nameof(GetAll),
-                ApiResponse<CategoryResponseDto>.SuccessResponse(
-                    result,
-                    "Category created successfully"
-                ));
+        [HttpPut("{id}")]
+        [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Update(int id, [FromBody] UpdateCategoryDto dto)
+        {
+            var success = await _service.UpdateAsync(id, dto);
+            if (!success)
+                return NotFound(ApiResponse<bool>.FailResponse("Category not found"));
+
+            return Ok(ApiResponse<bool>.SuccessResponse(true, "Category updated successfully"));
+        }
+
+        [HttpDelete("{id}")]
+        [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> Delete(int id)
+        {
+            var success = await _service.DeleteAsync(id);
+            if (!success)
+                return NotFound(ApiResponse<bool>.FailResponse("Category not found"));
+
+            return Ok(ApiResponse<bool>.SuccessResponse(true, "Category deleted successfully"));
         }
     }
 }
