@@ -18,6 +18,7 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 builder.Services.AddSwaggerGen(c =>
 {
+    // Swagger konfigurasyonu: JWT destegi ekliyoruz
     c.SwaggerDoc("v1", new OpenApiInfo { Title = "Net9WebApi", Version = "v1" });
     c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
     {
@@ -64,6 +65,7 @@ builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddProblemDetails();
 
 // DI - Services
+// Servisleri DI container'a ekliyoruz (Scoped tercih ettik cunku her request icin yeni instance olsun)
 builder.Services.AddScoped<ICategoryService, CategoryService>();
 builder.Services.AddScoped<IProductService, ProductService>();
 builder.Services.AddScoped<IUserService, UserService>();

@@ -57,6 +57,7 @@ namespace Net9WebApi.Services.Implementations
                 SigningCredentials = new SigningCredentials(new SymmetricSecurityKey(key), SecurityAlgorithms.HmacSha256Signature)
             };
 
+            // Token olusturma islemleri icin JwtSecurityTokenHandler kullaniyoruz
             var tokenHandler = new JwtSecurityTokenHandler();
             var token = tokenHandler.CreateToken(tokenDescriptor);
             return tokenHandler.WriteToken(token);
@@ -64,6 +65,7 @@ namespace Net9WebApi.Services.Implementations
 
         private string HashPassword(string password)
         {
+            // Identity kullanmadik, o yuzden basit bir SHA256 hash lemesi yapiyoruz
             using var sha256 = SHA256.Create();
             var bytes = sha256.ComputeHash(Encoding.UTF8.GetBytes(password));
             return Convert.ToBase64String(bytes);

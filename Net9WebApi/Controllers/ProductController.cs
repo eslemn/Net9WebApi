@@ -9,11 +9,12 @@ namespace Net9WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
+    [Authorize] // Bu controller sadece giris yapmis kullanicilara acik
     public class ProductController : ControllerBase
     {
         private readonly IProductService _service;
-
+        
+        // Dependency Injection ile servisi aliyoruz
         public ProductController(IProductService service)
         {
             _service = service;
