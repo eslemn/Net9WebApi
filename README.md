@@ -16,17 +16,19 @@ Bu proje, **.NET 9** ile geliştirilmiş bir **JSON tabanlı REST API** uygulama
 
 ```mermaid
 flowchart LR
-  A[Client / Postman / Swagger] --> B[Controllers]
-  A --> C[Minimal API Endpoints]
+  A["Client / Postman / Swagger"] --> B["Controllers"]
+  A --> C["Minimal API Endpoints"]
 
-  B --> D[Services (Interfaces + Implementations)]
+  B --> D["Services (Interfaces + Implementations)"]
   C --> D
 
-  D --> E[Data Layer - AppDbContext (EF Core)]
-  E --> F[(PostgreSQL Database)]
+  D --> E["Data Layer - AppDbContext (EF Core)"]
+  E --> F["PostgreSQL Database"]
 
-  B --> G[ApiResponse<T> Wrapper]
+  B --> G["ApiResponse<T> Wrapper"]
   C --> G
 
-  B --> H[GlobalExceptionHandler Middleware]
+  B --> H["GlobalExceptionHandler Middleware"]
   C --> H
+```
+
