@@ -9,5 +9,7 @@ namespace Net9WebApi.Services.Interfaces
         Task<ReviewDto> CreateAsync(CreateReviewDto dto);
         Task<bool> UpdateAsync(int id, UpdateReviewDto dto);
         Task<bool> DeleteAsync(int id);
+        Task<List<ReviewDto>> GetByProductIdAsync(int productId);
+        Task<List<ReviewDto>> GetByUserIdAsync(int userId);
     }
 }

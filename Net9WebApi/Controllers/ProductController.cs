@@ -13,11 +13,13 @@ namespace Net9WebApi.Controllers
     public class ProductController : ControllerBase
     {
         private readonly IProductService _service;
+        private readonly IReviewService _reviewService;
         
         // Dependency Injection ile servisi aliyoruz
-        public ProductController(IProductService service)
+        public ProductController(IProductService service, IReviewService reviewService)
         {
             _service = service;
+            _reviewService = reviewService;
         }
 
         [HttpGet]
@@ -41,6 +43,7 @@ namespace Net9WebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(ApiResponse<ProductDto>), StatusCodes.Status201Created)]
         public async Task<IActionResult> Create([FromBody] CreateProductDto dto)
         {
@@ -49,6 +52,7 @@ namespace Net9WebApi.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateProductDto dto)
@@ -61,6 +65,7 @@ namespace Net9WebApi.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id)
@@ -70,6 +75,14 @@ namespace Net9WebApi.Controllers
                 return NotFound(ApiResponse<bool>.FailResponse("Product not found"));
 
             return Ok(ApiResponse<bool>.SuccessResponse(true, "Product deleted successfully"));
+        }
+
+        [HttpGet("{id}/reviews")]
+        [ProducesResponseType(typeof(ApiResponse<List<ReviewDto>>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetReviews(int id)
+        {
+            var data = await _reviewService.GetByProductIdAsync(id);
+            return Ok(ApiResponse<List<ReviewDto>>.SuccessResponse(data));
         }
     }
 }

@@ -82,5 +82,25 @@ namespace Net9WebApi.Services.Implementations
             await _context.SaveChangesAsync();
             return true;
         }
+
+        public async Task<List<ReviewDto>> GetByProductIdAsync(int productId)
+        {
+            return await _context.Reviews
+                .Include(r => r.User)
+                .Include(r => r.Product)
+                .Where(r => r.ProductId == productId)
+                .Select(r => new ReviewDto(r.Id, r.Rating, r.Comment, r.UserId, r.User.Username, r.ProductId, r.Product.Name, r.CreatedAt))
+                .ToListAsync();
+        }
+
+        public async Task<List<ReviewDto>> GetByUserIdAsync(int userId)
+        {
+            return await _context.Reviews
+                .Include(r => r.User)
+                .Include(r => r.Product)
+                .Where(r => r.UserId == userId)
+                .Select(r => new ReviewDto(r.Id, r.Rating, r.Comment, r.UserId, r.User.Username, r.ProductId, r.Product.Name, r.CreatedAt))
+                .ToListAsync();
+        }
     }
 }

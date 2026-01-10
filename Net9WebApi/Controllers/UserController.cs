@@ -1,3 +1,4 @@
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Net9WebApi.DTOs;
@@ -8,13 +9,16 @@ namespace Net9WebApi.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class UserController : ControllerBase
     {
         private readonly IUserService _service;
+        private readonly IReviewService _reviewService;
 
-        public UserController(IUserService service)
+        public UserController(IUserService service, IReviewService reviewService)
         {
             _service = service;
+            _reviewService = reviewService;
         }
 
         [HttpGet]
@@ -38,6 +42,7 @@ namespace Net9WebApi.Controllers
         }
 
         [HttpPost]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(ApiResponse<UserDto>), StatusCodes.Status201Created)]
         public async Task<IActionResult> Create([FromBody] CreateUserDto dto)
         {
@@ -46,6 +51,7 @@ namespace Net9WebApi.Controllers
         }
 
         [HttpPut("{id}")]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Update(int id, [FromBody] UpdateUserDto dto)
@@ -58,6 +64,7 @@ namespace Net9WebApi.Controllers
         }
 
         [HttpDelete("{id}")]
+        [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(ApiResponse<bool>), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> Delete(int id)
@@ -67,6 +74,14 @@ namespace Net9WebApi.Controllers
                 return NotFound(ApiResponse<bool>.FailResponse("User not found"));
 
             return Ok(ApiResponse<bool>.SuccessResponse(true, "User deleted successfully"));
+        }
+
+        [HttpGet("{id}/reviews")]
+        [ProducesResponseType(typeof(ApiResponse<List<ReviewDto>>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetReviews(int id)
+        {
+            var data = await _reviewService.GetByUserIdAsync(id);
+            return Ok(ApiResponse<List<ReviewDto>>.SuccessResponse(data));
         }
 
         // Bonus: Login handling could be here or separately.
