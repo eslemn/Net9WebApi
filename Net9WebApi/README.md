@@ -20,6 +20,25 @@ Proje, temiz ve yönetilebilir bir **Katmanlı Mimari** (Layered Architecture) i
 - **Data Access Layer (Veri Erişim)**: EF Core `DbContext` ve Repository desenleri.
 - **Core/Domain Layer**: Varlıklar (`User`, `Product`, `Review`, `Category`) ve DTO nesneleri.
 
+### 📊 Mimari Diyagramı
+```mermaid
+flowchart LR
+    A["Client / Postman / Swagger"] --> B["Controllers"]
+    A --> C["Minimal API Endpoints"]
+
+    B --> D["Services (Interfaces + Implementations)"]
+    C --> D
+
+    D --> E["Data Layer - AppDbContext (EF Core)"]
+    E --> F["PostgreSQL Database"]
+
+    B --> G["ApiResponse Wrapper"]
+    C --> G
+
+    B --> H["GlobalExceptionHandler Middleware"]
+    C --> H
+```
+
 ### 🛠 Teknoloji Yığını
 - **Framework**: .NET 9.0
 - **Dil**: C# 13
