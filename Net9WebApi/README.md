@@ -21,6 +21,7 @@ Proje, temiz ve yönetilebilir bir **Katmanlı Mimari** (Layered Architecture) i
 - **Core/Domain Layer**: Varlıklar (`User`, `Product`, `Review`, `Category`) ve DTO nesneleri.
 
 ### 📊 Mimari Diyagramı
+<!-- Updated Diagram Syntax for GitHub Compatibility -->
 ```mermaid
 flowchart LR
     A["Client / Postman / Swagger"] --> B["Controllers"]
