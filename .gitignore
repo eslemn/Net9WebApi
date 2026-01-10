@@ -11,3 +11,7 @@ obj/
 
 # ASP.NET
 appsettings.Development.json
+
+# Logs
+*.log
+*.txt
